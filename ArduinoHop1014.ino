@@ -144,11 +144,11 @@ void loop()
      //set currentTime to 0
   }
   //send to servos
-  //command_servo(0,th1_command);
-  //command_servo(1,th2_command-th1_command);
+  command_servo(0,th1_command);
+  command_servo(1,th2_command-th1_command);
   
-  command_servo(0,0);
-  command_servo(1,110);
+  //command_servo(0,30);
+  //command_servo(1,180);
 //  
   
   
@@ -247,6 +247,7 @@ void command_servo(int servo,int angle)
   {
     //angle = 194-angle*(194-42)/180;
     angle = 120-angle*(194-42)/180;
+      //angle = 194-angle*(194-42)/180;
   }
   if(servo==hip_servo)
   {
