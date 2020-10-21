@@ -27,9 +27,15 @@ unsigned long evalTime = 500;
 #include <Encoder.h>
 #include "InterpolationLib.h"
 
+
+
 Servo hip;
 Servo knee; 
-Encoder heightEnc(8,7); //green = A phase...... White=B phase
+//Encoder heightEnc(8,7); //green = A phase...... White=B phase int long
+Encoder myEnc(7, 8);
+
+
+
 
 int hip_pos = 0;    // variable to store the servo position
 int knee_pos = 0; 
@@ -71,7 +77,7 @@ double wrongtrajKnee[] = {2.06942964, 1.94321547, 2.00794562, 2.12389948, 2.0786
 
  
 int j;
-int numHops = 2;
+int numHops = 4;
 int hopCounter = 0;
 
 double totalTime=0;
@@ -89,6 +95,7 @@ void setup()
 {
   delay(2000);
   Serial.begin(9600);
+  Serial.println("Basic Encoder Test:");
   hip.attach(HIP_SERVO_PIN);  
   knee.attach(KNEE_SERVO_PIN);
 
@@ -123,7 +130,7 @@ void setup()
     }
   }
   
-//    getReady();
+    //getReady();
 //    delay(1000);
 }
  
@@ -135,12 +142,25 @@ void loop()
   double th2_command=Interpolation::Linear(hm_cumSum, trajKnee, numValues, currentTime, true);
   //do for th2
   currentTime=currentTime+1.0/freq;
+
+  
+long newPosition = myEnc.read()*60.0/(360*4);
+  if (newPosition != oldPosition) {
+    oldPosition = newPosition;
+    Serial.println(newPosition);
+  }
+
+
+
+  
 //    Serial.print(currentTime,'\t');
-    EncoderHeightValue = get_height();
-    if (EncoderHeightValue != oldEncoderHeightValue){
-      Serial.println(EncoderHeightValue);
-      oldEncoderHeightValue =  EncoderHeightValue;
-    }
+    //EncoderHeightValue = get_height();
+    //int EncoderHeightValue2=heightEnc.read()*60.0/(360*4);
+//    if (EncoderHeightValue != oldEncoderHeightValue){
+//      Serial.println(EncoderHeightValue);
+//      oldEncoderHeightValue =  EncoderHeightValue;
+ //Serial.println(EncoderHeightValue2,"\t\n");
+   // }
 //    Serial.print(EncoderHeightValue,"\t\n");
 //    Serial.println(EncoderHeightValue*0.1963,'\t');
   if (currentTime>totalTime)
@@ -151,14 +171,14 @@ void loop()
 
   //send to servos
   if(hopCounter<numHops){
-    command_servo(0,th1_command);
-    command_servo(1,th2_command-th1_command+90);
+//    command_servo(0,th1_command);
+//    command_servo(1,th2_command-th1_command+90);
   }
-  else{
-    Serial.print("Done hopping");
-    //standStraight();
-    while(true);////////////////// CALLEN (to run only once)
-  }
+//  else{
+//    Serial.print("Done hopping");
+//    standStraight();
+//    while(true);////////////////// CALLEN (to run only once)
+//  }
   
   
   //command_servo(0,th1_command);
@@ -170,8 +190,14 @@ void loop()
  
   
   //Serial.print("%lf\n",th1_command);
-  wait_control_loop();  //waits 5ms if frequency set to 200Hz
+
+  
+//  wait_control_loop();  //waits 5ms if frequency set to 200Hz
+
+  
 //  delay(200);
+
+
 }
 
 //void loop() 
@@ -317,15 +343,17 @@ void getReady()
     command_servo(knee_servo,120);
 }
 
-long get_height()
-{
-  long temp= heightEnc.read();
-  if (temp != oldPosition) 
-  {
-    oldPosition = temp;
-  }
-  return temp;
-}
+//long get_height()
+//{
+//  long temp= heightEnc.read();
+//  long scaleFac=1;//0.06/(4*360);
+//  temp=temp*scaleFac;
+//  if (temp != oldPosition) 
+//  {
+//    oldPosition = temp;
+//  }
+//  return temp;
+//}
 
 void wait_control_loop()
 {
